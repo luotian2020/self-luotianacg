@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>洛天 - 二次元摄影 & 程序员的扩列主页</title>
+    <meta name="referrer" content="no-referrer">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ================= 基础配置 ================= */
+        :root { --primary-blue: #a0d8ef; --primary-pink: #f4b3c2; --bg-color: #f9f9fa; --text-main: #333333; --text-sub: #777777; --card-bg: #ffffff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: linear-gradient(135deg, #e0f2fe 0%, #fae8ff 100%); color: var(--text-main); line-height: 1.6; min-height: 100vh; overflow-x: hidden; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+
+        /* ================= 头部信息区 ================= */
+        .profile-header { text-align: center; background: var(--card-bg); border-radius: 24px; padding: 30px 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.03); margin-bottom: 25px; position: relative; overflow: hidden; }
+        .profile-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 80px; background: linear-gradient(90deg, var(--primary-blue), var(--primary-pink)); opacity: 0.8; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); object-fit: cover; position: relative; z-index: 1; margin-top: 10px; }
+        .nickname { font-size: 1.5rem; font-weight: bold; margin: 10px 0 5px; }
+        .identity { font-size: 0.9rem; color: var(--primary-blue); font-weight: bold; margin-bottom: 15px; }
+        .quote { font-size: 0.95rem; color: var(--text-sub); font-style: italic; margin-bottom: 15px; padding: 0 20px; }
+        
+        .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 10px; }
+        .tag { background: rgba(244, 179, 194, 0.15); color: #d16b8c; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+        .tag.game { background: rgba(160, 216, 239, 0.15); color: #589bb9; }
+
+        /* ================= 扩列区 (上移至此) ================= */
+        .kuolie-section { text-align: center; margin-bottom: 30px; padding: 30px; background: var(--card-bg); border-radius: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.03); }
+        .kuolie-section h2 { font-size: 1.3rem; margin-bottom: 10px; color: var(--primary-pink); }
+        .kuolie-section > p { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 25px; }
+
+        .qr-group { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; }
+        .qr-item { display: flex; flex-direction: column; align-items: center; }
+        .qr-title { font-size: 0.9rem; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        .title-wx { color: #07c160; } .title-xhs { color: #ff2442; } .title-dy { color: #111111; }
+        .qr-box { width: 120px; height: 120px; background: #f8f8f8; border-radius: 12px; display: block; border: 2px dashed #ddd; overflow: hidden; padding: 4px; }
+        .qr-box img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px; }
+
+        @media (max-width: 480px) {
+            .qr-group { gap: 12px; }
+            .qr-box { width: 90px; height: 90px; }
+            .qr-title { font-size: 0.8rem; }
+        }
+
+        /* ================= 生态区 ================= */
+        .section-title { font-size: 1.2rem; font-weight: bold; margin: 30px 0 15px; padding-left: 10px; border-left: 4px solid var(--primary-pink); display: flex; align-items: center; gap: 8px; }
+        .ecosystem-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
+        .eco-card { background: var(--card-bg); border-radius: 16px; padding: 20px; text-align: center; text-decoration: none; color: var(--text-main); box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: all 0.3s ease; }
+        .eco-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .eco-card i { font-size: 1.8rem; margin-bottom: 10px; background: -webkit-linear-gradient(45deg, var(--primary-blue), var(--primary-pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .eco-card h3 { font-size: 1rem; margin-bottom: 5px; }
+        .eco-card p { font-size: 0.75rem; color: var(--text-sub); }
+
+        /* ================= 核心作品区 (卡片列表流) ================= */
+        .works-container { display: flex; flex-direction: column; gap: 25px; margin-bottom: 30px; }
+        .work-card { display: flex; flex-direction: column; background: var(--card-bg); border-radius: 18px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.04); opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+        .work-card.loaded { opacity: 1; transform: translateY(0); }
+        
+        .img-wrapper { background: #f0f0f0; width: 100%; }
+        /* 手机端自适应高度，保证原图完整展现不被裁剪 */
+        .img-wrapper img { width: 100%; height: auto; display: block; } 
+        
+        .work-details { flex-grow: 1; padding: 20px; background-image: repeating-linear-gradient(transparent, transparent 28px, rgba(244, 179, 194, 0.1) 28px, rgba(244, 179, 194, 0.1) 29px); }
+        .work-details h3 { font-size: 1.25rem; color: #d16b8c; margin-bottom: 12px; border-bottom: 2px dashed rgba(244, 179, 194, 0.3); display: inline-block; padding-bottom: 5px; font-family: serif; }
+        .work-details p { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 8px; display: flex; align-items: center; }
+        .work-details p i { width: 22px; color: var(--primary-blue); margin-right: 6px; font-size: 1rem; text-align: center; }
+        .work-details p.note { color: #d16b8c; font-size: 0.85rem; margin-top: 12px; }
+
+        /* PC端专属大屏分栏排版 */
+        @media (min-width: 769px) {
+            .works-container { gap: 30px; }
+            .work-card:hover { box-shadow: 0 12px 30px rgba(0,0,0,0.08); transform: translateY(-3px); }
+            .work-card.is-portrait { flex-direction: row; align-items: stretch; }
+            .work-card.is-portrait .img-wrapper { width: 50%; max-height: 650px; border-right: 1px solid rgba(0,0,0,0.05); }
+            .work-card.is-portrait .img-wrapper img { height: 100%; object-fit: cover; }
+            .work-card.is-portrait .work-details { width: 50%; display: flex; flex-direction: column; justify-content: center; padding: 30px; }
+        }
+
+        /* ================= 折叠报价单区 ================= */
+        .price-container { background: var(--card-bg); border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin: 30px 0; overflow: hidden; transition: all 0.3s ease; }
+        .price-toggle { padding: 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: linear-gradient(135deg, rgba(160, 216, 239, 0.1) 0%, rgba(244, 179, 194, 0.1) 100%); color: #d16b8c; font-weight: bold; font-size: 1.1rem; user-select: none; transition: background 0.3s; }
+        .price-toggle:hover { background: linear-gradient(135deg, rgba(160, 216, 239, 0.2) 0%, rgba(244, 179, 194, 0.2) 100%); }
+        .price-toggle i.arrow { transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        .price-container.open .price-toggle i.arrow { transform: rotate(180deg); }
+
+        .price-content { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.5s ease, opacity 0.5s ease; padding: 0 20px; }
+        .price-container.open .price-content { max-height: 500px; opacity: 1; padding: 10px 20px 25px; }
+
+        .price-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 15px; }
+        @media (min-width: 500px) { .price-grid { grid-template-columns: 1fr 1fr; } } 
+
+        .price-card { background: #fafafa; border: 1px solid #eee; border-radius: 12px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
+        .price-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+        .price-card.cz::before { background: var(--primary-blue); } 
+        .price-card.wj::before { background: var(--primary-pink); } 
+
+        .price-card h4 { font-size: 1rem; color: var(--text-main); margin-bottom: 10px; }
+        .price-card .amount { font-size: 2rem; font-weight: bold; font-family: "Helvetica Neue", sans-serif; margin-bottom: 5px; }
+        .price-card.cz .amount { color: #589bb9; }
+        .price-card.wj .amount { color: #d16b8c; }
+        .price-card .amount span { font-size: 0.9rem; font-weight: normal; color: var(--text-sub); }
+        .price-card p { font-size: 0.8rem; color: var(--text-sub); }
+        .price-note { text-align: center; font-size: 0.8rem; color: #aaa; margin-top: 15px; font-style: italic; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- 1. 个人资料区 -->
+    <header class="profile-header">
+        <img src="./touxiang.jpg" alt="头像" class="avatar">
+        <h1 class="nickname">洛天</h1>
+        <div class="identity"><i class="fa-solid fa-camera"></i> 二次元摄影 · <i class="fa-solid fa-code"></i> 程序员</div>
+        <p class="quote">“自己快乐就好，把爱与赤诚留给值得的人”</p>
+        <div class="tags">
+            <span class="tag"><i class="fa-solid fa-star"></i> 萌妹 / 糖水风</span>
+            <span class="tag">洛天依</span><span class="tag">流萤</span><span class="tag">昔涟</span><span class="tag">甘雨</span><span class="tag">刻晴</span>
+            <span class="tag game"><i class="fa-solid fa-gamepad"></i> 原神</span><span class="tag game">崩坏星穹铁道</span>
+        </div>
+    </header>
+
+    <!-- 2. 扩列区 (置顶版) -->
+    <section class="kuolie-section">
+        <h2><i class="fa-solid fa-handshake-angle" style="color: #ff69b4;"></i> 欢迎扩列 · 期待相遇</h2>
+        <p>接客片，欢迎扫码找我约拍、讨论代码与摄影！</p>
+        
+        <div class="qr-group">
+            <div class="qr-item">
+                <div class="qr-title title-wx"><i class="fa-brands fa-weixin"></i> 微信</div>
+                <div class="qr-box">
+                    <img src="./weixin.jpg" alt="微信二维码">
+                </div>
+            </div>
+            <div class="qr-item">
+                <div class="qr-title title-xhs"><i class="fa-solid fa-book-open"></i> 小红书</div>
+                <div class="qr-box">
+                    <img src="./xiaohongshu.jpg" alt="小红书主页">
+                </div>
+            </div>
+            <div class="qr-item">
+                <div class="qr-title title-dy"><i class="fa-brands fa-tiktok"></i> 抖音</div>
+                <div class="qr-box">
+                    <img src="./douyin.jpg" alt="抖音主页">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 生态矩阵区 -->
+    <h2 class="section-title"><i class="fa-solid fa-link"></i> 我的生态宇宙</h2>
+    <section class="ecosystem-grid">
+        <a href="https://cos.luotianacg.com" target="_blank" class="eco-card"><i class="fa-solid fa-camera-retro"></i><h3>开心摄</h3><p>自建摄影工作流</p></a>
+        <a href="https://www.luotianacg.com" target="_blank" class="eco-card"><i class="fa-solid fa-book-open"></i><h3>天影札记</h3><p>摄影作品集</p></a>
+        <a href="https://doc.luotianacg.com" target="_blank" class="eco-card"><i class="fa-solid fa-pen-ruler"></i><h3>策划寄存</h3><p>摄影策划文档</p></a>
+        <a href="https://github.com/luotian2020/photo-application" target="_blank" class="eco-card"><i class="fa-brands fa-github"></i><h3>洛天工具箱</h3><p>开源桌面软件</p></a>
+    </section>
+
+    <!-- 4. 作品列表区 -->
+    <h2 class="section-title"><i class="fa-solid fa-images"></i> 摄影图录</h2>
+    <section class="works-container" id="albumContainer"></section>
+
+    <!-- 5. 可折叠报价单 (当前为注释隐藏状态，需要时解开注释即可) -->
+     <div class="price-container" id="priceBox">
+        <div class="price-toggle" onclick="document.getElementById('priceBox').classList.toggle('open')">
+            <span><i class="fa-solid fa-hand-holding-dollar"></i> 查看约拍报价</span>
+            <i class="fa-solid fa-chevron-down arrow"></i>
+        </div>
+        <div class="price-content">
+            <div class="price-grid">
+                <div class="price-card cz">
+                    <h4><i class="fa-solid fa-people-group" style="color:#589bb9;"></i> 漫展场照</h4>
+                    <div class="amount">¥100 <span>/ 4张精修</span></div>
+                    <p>捕捉展会绝美瞬间，豪华灯阵</p>
+                </div>
+                <div class="price-card wj">
+                    <h4><i class="fa-solid fa-camera-retro" style="color:#d16b8c;"></i> 外景 / 棚拍</h4>
+                    <div class="amount">¥299 <span>/ 不限时</span></div>
+                    <p>私人定制主题，时间充裕包出片</p>
+                </div>
+            </div>
+            <p class="price-note">* 以上为基础报价，可拍视频，特殊需求/远途可加下方联系方式详聊~</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- ================= JS 数据与逻辑核心 ================= -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        
+        // 渲染所需的作品数据列表
+        const worksData = [
+         { title: "花海流萤", imgUrl: "https://i1.hdslb.com/bfs/new_dyn/274409d4ea1868b0d7ad2e69700966f734866765.png", date: "2026.04.07", character: "流萤", model: "布布", type: "外景", note: "希望那是一个有流星划过的美丽夜晚。" },
+            { title: "再度和你", imgUrl: "https://i0.hdslb.com/bfs/new_dyn/12aa32d4096ed7420ffe1e5230ccddfb34866765.jpg", date: "2026.03.07", character: "昔涟", model: "布布", type: "棚拍", note: "只是守候而已，微不足道的代价，不是吗！" },
+            { title: "饿师傅", imgUrl: "https://i0.hdslb.com/bfs/new_dyn/755ac74a076ea48e625891a184755d0f34866765.png", date: "2026.03.14", character: "洛天依", model: "午安小狸", type: "外景", note: "捕获了一只吃货殿下！" },
+            { title: "洛天依Lolita", imgUrl: "https://i0.hdslb.com/bfs/new_dyn/c885d57a48c883c6be6d0c104d97188334866765.png", date: "2026.04.04", character: "洛天依", model: "期颐", type: "外景", note: "樱花树下" },
+             { title: "忧郁三月七", imgUrl: "https://i0.hdslb.com/bfs/new_dyn/7d6de6fbf87edc9e4b5f9bbc8ac8441634866765.jpg", date: "2026.04.05", character: "三月七", model: "期颐", type: "外景", note: "树下沉睡的三月七" },
+             { title: "圣诞雷姆", imgUrl: "https://i0.hdslb.com/bfs/new_dyn/616154266d765112a82478d6d91f7c9634866765.jpg", date: "2026.01.01", character: "雷姆", model: "塔塔饼干", type: "场照", note: "可爱的圣诞雷姆" },
+             { title: "洛天依 V3", imgUrl: "https://i0.hdslb.com/bfs/new_dyn/cb66337c58ad1d0580a6cc241942d9cb34866765.png", date: "2025.10.05", character: "洛天依", model: "期颐", type: "场照", note: "洛天依V3最棒了,太经典了" },
+              { title: "甘雨-银杏初见", imgUrl: "https://i0.hdslb.com/bfs/new_dyn/6ef3b97e4be67f056efe9218ca340c2634866765.png", date: "2025.11.05", character: "甘雨", model: "期颐", type: "外景", note: "银杏叶落，甘雨如诗" },
+               { title: "爱神使者来临", imgUrl: "https://i0.hdslb.com/bfs/new_dyn/2c0b3c40d90098ec385d0daf308958ca34866765.jpg", date: "2025.10.12", character: "爱莉希雅", model: "之岁", type: "棚拍", note: "美美美" },
+        
+        ];
+         // 🌟 核心逻辑：按日期 (date) 倒序排列作品（最新的在最前）
+        worksData.sort((a, b) => {
+            // 由于格式是标准的 YYYY.MM.DD，使用 localeCompare 即可完美实现字符串的降序排列
+            return b.date.localeCompare(a.date);
+        });
+
+        const albumContainer = document.getElementById('albumContainer');
+
+        function renderWorks() {
+            let htmlContent = '';
+            worksData.forEach(work => {
+                let typeIcon = "fa-camera"; 
+                if (work.type === "棚拍") typeIcon = "fa-person-booth";
+                if (work.type === "外景") typeIcon = "fa-tree-city";
+                if (work.type === "场照") typeIcon = "fa-people-group";
+
+                htmlContent += `
+                    <div class="work-card">
+                        <div class="img-wrapper"><img  src="${work.imgUrl}" alt="${work.character}" class="auto-orient-img"></div>
+                        <div class="work-details">
+                            <h3>${work.title}</h3>
+                            <p><i class="fa-solid fa-user"></i> 出镜模特：${work.model}</p>
+                            <p><i class="fa-solid fa-calendar-days"></i> 拍摄日期：${work.date}</p>
+                            <p><i class="fa-solid fa-mask"></i> 拍摄角色：${work.character}</p>
+                            <p><i class="fa-solid ${typeIcon}"></i> 拍摄类型：${work.type}</p>
+                            ${work.note ? `<p class="note"><i class="fa-solid fa-pen-nib"></i> 摄影手记：${work.note}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            albumContainer.innerHTML = htmlContent;
+        }
+
+        // 执行初始渲染
+        renderWorks();
+
+        // 图片加载与横竖图自动排版判定
+        const images = document.querySelectorAll('.auto-orient-img');
+        
+        images.forEach(img => {
+            if (img.complete) applyLayout(img);
+            else {
+                img.addEventListener('load', () => applyLayout(img));
+                img.addEventListener('error', () => img.closest('.work-card').classList.add('is-landscape', 'loaded'));
+            }
+        });
+
+        function applyLayout(img) {
+            const card = img.closest('.work-card');
+            // 如果宽度大于等于高度，判定为横排；反之判定为竖排 (供PC端排版调用)
+            if (img.naturalWidth >= img.naturalHeight) card.classList.add('is-landscape');
+            else card.classList.add('is-portrait');
+            
+            // 加入载入完成样式，触发向上浮出淡入的 CSS 动画
+            card.classList.add('loaded'); 
+        }
+
+    });
+</script>
+
+</body>
+</html>
